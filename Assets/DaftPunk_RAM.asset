@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b8eee16172038b4ebcb14706b4da87a, type: 3}
+  m_Name: DaftPunk_RAM
+  m_EditorClassIdentifier: 
+  nomAlbum: DaftPunk_RAM
+  photoArtiste: {fileID: 21300000, guid: 1ae6303391bf59b4e8495490ee6fe573, type: 3}
+  ficheAnecdote: {fileID: 21300000, guid: 38210afbb4f514a46893f3f27fe61625, type: 3}
+  ficheChiffres: {fileID: 21300000, guid: 9078ed8b70e33b645b2412230c98e432, type: 3}
+  ficheHistoire: {fileID: 21300000, guid: 68d29be518bd83146835aa170c223223, type: 3}
