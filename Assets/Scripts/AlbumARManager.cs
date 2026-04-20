@@ -6,52 +6,56 @@ public class AlbumARManager : MonoBehaviour
 {
     [SerializeField] private ARTrackedImageManager imageManager;
     [SerializeField] private List<AlbumData> listeAlbums;
+    [SerializeField] private GameObject prefabAInstancier; // Ton prefab AlbumContent
+
+    // Dictionnaire pour stocker l'unique instance par image
+    private Dictionary<string, GameObject> instances = new Dictionary<string, GameObject>();
 
     private void OnEnable() => imageManager.trackedImagesChanged += OnChanged;
     private void OnDisable() => imageManager.trackedImagesChanged -= OnChanged;
 
     void OnChanged(ARTrackedImagesChangedEventArgs eventArgs)
     {
+        // 1. Création unique pour les nouvelles images
         foreach (var newImage in eventArgs.added)
         {
-            UpdateImage(newImage);
+            string imageName = newImage.referenceImage.name;
+
+            if (!instances.ContainsKey(imageName))
+            {
+                // On instancie NOUS-MÊMES le prefab comme enfant de l'image détectée
+                GameObject instance = Instantiate(prefabAInstancier, newImage.transform);
+                instances.Add(imageName, instance);
+
+                // Initialisation des données
+                UpdateAlbumData(imageName, instance);
+            }
         }
+
+        // 2. Gestion de la visibilité pour les mises à jour
         foreach (var updatedImage in eventArgs.updated)
         {
-            // On ne met à jour que si l'image est bien suivie
-            if (updatedImage.trackingState == UnityEngine.XR.ARSubsystems.TrackingState.Tracking)
+            string imageName = updatedImage.referenceImage.name;
+            if (instances.ContainsKey(imageName))
             {
-                UpdateImage(updatedImage);
+                // On n'affiche l'objet que si le tracking est optimal
+                bool isVisible = updatedImage.trackingState == UnityEngine.XR.ARSubsystems.TrackingState.Tracking;
+                instances[imageName].SetActive(isVisible);
             }
         }
     }
 
-    void UpdateImage(ARTrackedImage trackedImage)
+    void UpdateAlbumData(string imageName, GameObject instance)
     {
-        // 1. FORCER L'ACTIVATION : On active le visuel qui est attaché à l'image
-        trackedImage.gameObject.SetActive(true);
-
-        // 2. RECUPERER LE HANDLER
-        var handler = trackedImage.GetComponentInChildren<AlbumTrackableEventHandler>(true); // Le 'true' permet de trouver même si c'est caché
-
+        var handler = instance.GetComponentInChildren<AlbumTrackableEventHandler>(true);
         if (handler != null)
         {
-            // 3. RECHERCHE DES DONNÉES
-            AlbumData data = listeAlbums.Find(a => a.name == trackedImage.referenceImage.name);
-
+            AlbumData data = listeAlbums.Find(a => a.name == imageName);
             if (data != null)
             {
                 handler.SetupAlbum(data);
-                Debug.Log($"Succès : Données appliquées pour {data.name}");
+                Debug.Log($"Données appliquées : {data.name}");
             }
-            else
-            {
-                Debug.LogWarning($"Attention : Aucune donnée trouvée pour l'image nommée '{trackedImage.referenceImage.name}'");
-            }
-        }
-        else
-        {
-            Debug.LogError("Erreur : Le script AlbumTrackableEventHandler est introuvable sur le Prefab !");
         }
     }
 }

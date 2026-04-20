@@ -2,8 +2,8 @@ using UnityEngine;
 
 public class FloatAnimation : MonoBehaviour
 {
-    public float amplitude = 0.01f; // Hauteur du mouvement
-    public float vitesse = 2f;      // Vitesse du mouvement
+    public float amplitude = 0.005f; // Hauteur du mouvement
+    public float vitesse = 0.5f;      // Vitesse du mouvement
     private Vector3 posInitiale;
 
     void Start() => posInitiale = transform.localPosition;
