@@ -19,6 +19,8 @@ public class ModeSwitcher : MonoBehaviour
 
     void Start()
     {
+        // Exclure les bords du swipe Android
+        Screen.safeArea.ToString();
         Debug.Log("ModeSwitcher démarré !");
         imageManager.enabled = true;
         faceManager.enabled = false;
@@ -54,18 +56,27 @@ public class ModeSwitcher : MonoBehaviour
         faceTrackingUI.SetActive(true);
     }
 
-    private IEnumerator ToImageCoroutine()
+    private IEnumerator ToFaceCoroutine()
     {
-        faceTrackingUI.SetActive(false);
-        faceManager.enabled = false;
-        ClearFaceMasks();
+        imageTrackingUI.SetActive(false);
+        imageManager.enabled = false;
 
-        cameraManager.requestedFacingDirection = CameraFacingDirection.World;
-
+        cameraManager.requestedFacingDirection = CameraFacingDirection.User;
         yield return new WaitForSeconds(switchDelay);
 
-        imageManager.enabled = true;
-        imageTrackingUI.SetActive(true);
+        // Désactiver complètement la session AR et la relancer
+        var session = FindObjectOfType<ARSession>();
+        if (session != null)
+        {
+            session.enabled = false;
+            yield return null;
+            session.enabled = true;
+            yield return new WaitForSeconds(1f);
+        }
+
+        faceManager.enabled = true;
+        faceTrackingUI.SetActive(true);
+        Debug.Log("Activation du face manager...");
     }
 
     private void ClearFaceMasks()
